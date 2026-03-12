@@ -141,8 +141,17 @@ def main():
         nonlocal ctrl_held
         if key in (keyboard.Key.ctrl_l, keyboard.Key.ctrl_r):
             ctrl_held = True
-        elif ctrl_held and hasattr(key, 'char') and key.char == "'":
-            on_hotkey()
+        elif ctrl_held and (
+            (hasattr(key, 'char') and key.char == "'") or
+            (hasattr(key, 'vk') and key.vk == 222)
+        ):
+            try:
+                print("\n  [DEBUG] Hotkey detected — running pipeline...")
+                on_hotkey()
+            except Exception as e:
+                import traceback
+                print(f"\n  [ERROR] Pipeline crashed: {e}")
+                traceback.print_exc()
 
     def on_release(key):
         nonlocal ctrl_held
