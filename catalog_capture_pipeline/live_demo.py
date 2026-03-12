@@ -88,7 +88,9 @@ def on_hotkey():
     overlay.show_capture_flash(mouse_x, mouse_y)
 
     # Save screenshot
-    screenshot_path = os.path.join(os.path.dirname(__file__), "assets", "last_capture.png")
+    assets_dir = os.path.join(os.path.dirname(__file__), "assets")
+    os.makedirs(assets_dir, exist_ok=True)
+    screenshot_path = os.path.join(assets_dir, "last_capture.png")
     image.save(screenshot_path)
 
     ocr_result = ocr_engine.extract_text(image)
