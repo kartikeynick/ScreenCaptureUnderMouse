@@ -1,0 +1,15 @@
+# Catalog Capture Pipeline — Dependencies
+#
+# Mock mode (testing): only Pillow needed
+# Live mode (workbench): all packages needed
+#
+# Install: pip install -r requirements.txt
+
+# ── Always needed ──
+Pillow>=10.0
+
+# ── Live mode only (comment out for mock-only testing) ──
+easyocr>=1.7
+mss>=9.0
+pynput>=1.7
+numpy>=1.24

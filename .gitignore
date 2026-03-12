@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environments
+venv/
+venv_arm64/
+
+# Runtime outputs (generated at runtime, not source)
+catalog_capture_pipeline/assets/captures.txt
+catalog_capture_pipeline/assets/last_capture.png
+catalog_capture_pipeline/capture_pipeline.log
+capture_pipeline.log
+
+# IDE
+.idea/
+*.iml
+
+# macOS
+.DS_Store
