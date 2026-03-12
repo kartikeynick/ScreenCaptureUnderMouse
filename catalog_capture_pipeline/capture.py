@@ -92,25 +92,46 @@ def _generate_test_image() -> Image.Image:
     return img
 
 
+def _hide_cursor():
+    """
+    Hides the mouse cursor. Returns a callable that restores it.
+    Supports macOS (Quartz) and Windows (ctypes). No-op on other platforms.
+    """
+    import sys
+    import time
+
+    if sys.platform == "darwin":
+        try:
+            from Quartz import CGDisplayHideCursor, CGDisplayShowCursor, CGMainDisplayID
+            CGDisplayHideCursor(CGMainDisplayID())
+            time.sleep(0.05)  # wait one frame for cursor to disappear
+            return lambda: CGDisplayShowCursor(CGMainDisplayID())
+        except Exception:
+            return lambda: None
+
+    elif sys.platform == "win32":
+        try:
+            import ctypes
+            ctypes.windll.user32.ShowCursor(False)
+            time.sleep(0.05)
+            return lambda: ctypes.windll.user32.ShowCursor(True)
+        except Exception:
+            return lambda: None
+
+    return lambda: None
+
+
 def _real_capture(center_x: int, center_y: int) -> Image.Image:
     """
     Takes a real screenshot of the region around the cursor using mss.
     Hides the cursor before capture so it doesn't occlude text.
     """
     import mss
-    import time
 
     half_w = BOX_WIDTH // 2
     half_h = BOX_HEIGHT // 2
 
-    # Hide cursor so it doesn't cover text in the screenshot
-    try:
-        from Quartz import CGDisplayHideCursor, CGDisplayShowCursor, CGMainDisplayID
-        CGDisplayHideCursor(CGMainDisplayID())
-        time.sleep(0.05)  # wait one frame for cursor to disappear
-        cursor_hidden = True
-    except Exception:
-        cursor_hidden = False
+    restore_cursor = _hide_cursor()
 
     try:
         with mss.mss() as sct:
@@ -136,7 +157,6 @@ def _real_capture(center_x: int, center_y: int) -> Image.Image:
             screenshot = sct.grab(region)
             img = Image.frombytes("RGB", screenshot.size, screenshot.bgra, "raw", "BGRX")
     finally:
-        if cursor_hidden:
-            CGDisplayShowCursor(CGMainDisplayID())
+        restore_cursor()
 
     return img
